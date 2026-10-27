@@ -11,9 +11,16 @@ A five-stage workflow. Stage 1 runs once for the project or feature. Stages 2 to
 
 The plan (Stage 1) is for large work: a new project, a big feature, a change that spans many parts. When the user asks for a small detail, use your own judgment on how to handle it.
 
+## This skill comes first
+
+While this skill is active, its stages and rules take precedence over the workflows of the skills it calls, including Superpowers:
+
+- Do not replace Stage 1 with Superpowers' `brainstorming` or its own planning flow.
+- Superpowers may run without pausing in some steps. That does not override this skill's approval rules (subagents, MCP servers and external sources) or its stops (after Stage 1, and after each task's report).
+
 ## Subagents
 
-Use subagents as needed, at any stage. Before starting them, tell the user which subagents you want to use and for what, then wait for the user's approval. Do not start any subagent without it. This includes subagents that other skills start, such as Superpowers' `subagent-driven-development`.
+Use subagents as needed, at any stage. Before starting them, tell the user which subagents you want to use and for what, then wait for the user's approval. Do not start any subagent without it. This includes subagents that other skills start, such as the final reviewer that Superpowers' `executing-plans` dispatches.
 
 ## Suggestions and external sources
 
@@ -30,26 +37,32 @@ In the code review (Stage 3) and the report (Stage 5), speak like a professor of
    - What the task includes.
    - What will be changed in it.
    - The expected outputs.
-3. **Execution recommendation.** For each task, recommend in detail:
+3. **Plan file.** Save the plan and its tasks to a file in the project, using Superpowers' `writing-plans` format and location (each task with its steps, the files it creates or modifies, and `Expected:` lines). Stage 2 executes from this file. Keep the three items above in every task. When the file is saved, skip the execution question that `writing-plans` asks at its end; the next step replaces it.
+4. **Execution recommendation.** For each task, recommend in detail:
    - How to execute it.
    - The suitable model.
    - The suitable effort level.
-4. **Wait.** Stop and wait for the user to write a task number (`task 1`, `task 2`, ...). Each task is executed by its number.
+5. **Wait.** Stop and wait for the user to write a task number (`task 1`, `task 2`, ...). Each task is executed by its number.
 
 ## Stage 2: Execute the task
 
-Starts when the user writes `task N`. Execute task N using the Superpowers skills:
+Starts when the user writes `task N`. Execute task N from the plan file with Superpowers' `executing-plans`:
 
-- `executing-plans` or `subagent-driven-development`
-- `test-driven-development`
+- Execute **task N only**. When it is done, do not continue to the next task; go to Stage 3.
+- Follow `test-driven-development`: write the test, watch it fail, then write the code.
+- When the code is wrong, use `systematic-debugging` to find the root cause.
+- Work on a separate branch (worktree), as `executing-plans` requires. Never work on `main` or `master` without the user's approval.
+- Do not run `finishing-a-development-branch`. Merging, opening a PR or discarding the branch is the user's decision after the report.
+- Record every ruling `executing-plans` makes (deviations from the plan) for the report.
 
 ## Stage 3: Code review and testing
 
 Starts automatically when Stage 2 ends. Together with Superpowers:
 
-- A full code review of the task: `requesting-code-review`, then `receiving-code-review` to act on the findings.
+- A full code review of the task: `requesting-code-review`, then `receiving-code-review` to act on the findings. The final review that `executing-plans` runs is part of this stage, not a separate one.
 - A test for every part of the task.
 - `verification-before-completion` before moving on.
+- Record the minor findings that were deferred, not fixed, for the report.
 
 ## Stage 4: Security testing
 
@@ -72,6 +85,6 @@ A fully organized report, in this order:
 3. **Modified files (very important):** in detail, as bullet points. For each file:
    - What changed in it.
    - Whether best practices were used.
-4. **Stage results:** a section for the results of Stage 2, Stage 3 and Stage 4, including the results of every test.
-5. **Risks:** remaining risks, the security testing results, and proposed solutions.
+4. **Stage results:** a section for the results of Stage 2, Stage 3 and Stage 4, including the results of every test. Stage 2 includes the rulings made during execution.
+5. **Risks:** remaining risks, the security testing results, the deferred minor findings, and proposed solutions.
 6. **Final results:** confirmation that the task is implemented 100% correctly, and an evaluation of everything done in it.

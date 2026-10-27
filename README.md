@@ -27,6 +27,13 @@ The skill calls these skills. Install them for the full workflow:
 
 If one of them is missing, the agent says so in the report and continues with the others.
 
+Install Superpowers:
+
+- **Claude Code:** `/plugin marketplace add obra/superpowers-marketplace`, then `/plugin install superpowers@superpowers-marketplace`
+- **Codex:** `codex plugin add superpowers@openai-curated-remote`, or `/plugins` and search for `superpowers`
+
+The skill writes each plan with Superpowers' `writing-plans` (saved under `docs/superpowers/plans/`) and executes one task at a time with `executing-plans`, on a separate branch.
+
 ## Install
 
 **Claude Code** (all projects):
